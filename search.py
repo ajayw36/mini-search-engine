@@ -20,12 +20,12 @@ def tokenize(text):
     tokens = re.findall(r"[a-z0-9]+", text)
     return tokens
 
-# Indexer - returns token --> set of docs
+# Indexer - returns token --> frequency counter of docs
 def build_index(documents):
-    index = defaultdict(set)
+    index = defaultdict(lambda: defaultdict(int))
     for doc_path, text in documents.items():
         for token in tokenize(text):
-            index[token].add(doc_path)
+            index[token][doc_path] += 1
     return index
 
 # Match Count Ranking --> returns a list of documents ranked by score
@@ -33,8 +33,8 @@ def search(query, index):
     query_tokens = tokenize(query)
     ranker = defaultdict(int)
     for token in query_tokens:
-        for doc in index[token]:
-            ranker[doc] += 1
+        for doc, count in index[token].items():
+            ranker[doc] += count
 
     ranked_results = sorted(
         ranker.items(), 
