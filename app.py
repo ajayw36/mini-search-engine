@@ -24,8 +24,9 @@ def main():
 
         for position, (doc_path, score) in enumerate(results, start=1):
             snippet = make_snippet(engine.documents[doc_path], query)
-            print(f"{position}. {doc_path} — score: {score}")
-            print(f"    {snippet}")
+            print(f"{position}. {doc_path} — score: {score:.4f}")
+            print(f"   {snippet}")
+            print()
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from search_engine.tokenizer import tokenize
 import re
 
-def make_snippet(text, query, window=200):
+def make_snippet(text, query, window=50):
     """Return a short excerpt of `text` around the first query-term match."""
     query_tokens = tokenize(query)
     lower_text = text.lower()
