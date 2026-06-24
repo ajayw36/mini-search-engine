@@ -72,5 +72,5 @@ if __name__ == "__main__":
             print("No results found.")
             continue
 
-        for rank, (doc_path, score) in enumerate(results, start=1):
+        for rank, (doc_path, score) in enumerate(results[:10], start=1):
             print(f"{rank}. {doc_path} — score: {score}")
