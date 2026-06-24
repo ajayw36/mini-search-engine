@@ -34,6 +34,10 @@ def build_index(documents):
     frequency_counter = defaultdict(lambda : defaultdict(int))
     for doc_path, text in documents.items():
         tokenized_text = tokenize(text)
+        
+        if not tokenized_text:
+            continue
+
         tokenized_documents[doc_path] = tokenized_text
 
         for token in tokenized_text:
@@ -46,7 +50,9 @@ def build_index(documents):
             tf = count / document_length
 
             docs_containing_token = len(document_counter)
-            idf = math.log (num_documents / docs_containing_token)
+
+            # Smoothing to avoid scores of 0
+            idf = math.log ((num_documents + 1) / (docs_containing_token + 1)) + 1
         
             tf_idf_index[token][doc_path] = tf * idf
     
@@ -55,10 +61,12 @@ def build_index(documents):
 #  Ranking 
 def search(query, index):
     query_tokens = tokenize(query)
-    ranker = defaultdict(int)
+    ranker = defaultdict(float)
     for token in query_tokens:
-        for doc, count in index[token].items():
-            ranker[doc] += count
+        if token not in index:
+            continue
+        for doc, score in index[token].items():
+            ranker[doc] += score
 
     ranked_results = sorted(
         ranker.items(), 
