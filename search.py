@@ -3,6 +3,10 @@ import re
 from collections import defaultdict
 
 DOCS_DIR = Path("docs")
+STOP_WORDS = {
+    "the", "and", "is", "in", "of", "to", "a", "an", "for", "on",
+    "with", "as", "by", "at", "from", "this", "that", "it", "be"
+}
 
 # Data Source
 def load_documents():
@@ -18,7 +22,7 @@ def load_documents():
 def tokenize(text):
     text = text.lower()
     tokens = re.findall(r"[a-z0-9]+", text)
-    return tokens
+    return [token for token in tokens if token not in STOP_WORDS]
 
 # Indexer - returns token --> frequency counter of docs
 def build_index(documents):
@@ -72,5 +76,6 @@ if __name__ == "__main__":
             print("No results found.")
             continue
 
+        # Print the top 10 results
         for rank, (doc_path, score) in enumerate(results[:10], start=1):
             print(f"{rank}. {doc_path} — score: {score}")
