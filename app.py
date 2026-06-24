@@ -2,7 +2,7 @@
 
 from search_engine.search import SearchEngine
 from search_engine.snippets import make_snippet
-
+from search_engine.snippets import get_title
 
 def main():
     engine = SearchEngine()
@@ -24,7 +24,8 @@ def main():
 
         for position, (doc_path, score) in enumerate(results, start=1):
             snippet = make_snippet(engine.documents[doc_path], query)
-            print(f"{position}. {doc_path} — score: {score:.4f}")
+            title = get_title(doc_path, engine.documents[doc_path])
+            print(f"{position}. {title} — score: {score:.4f}")
             print(f"   {snippet}")
             print()
 

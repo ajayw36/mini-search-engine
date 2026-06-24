@@ -13,7 +13,7 @@ class SearchEngine:
         # another scorer (e.g. build_bm25) to change ranking methods.
         self.scores = build_tf_idf(self.index, self.document_lengths)
 
-    def search(self, query, top_k=10):
+    def search(self, query, top_k=3):
         """Return the top `top_k` (doc_path, score) results for `query`."""
         results = rank(query, self.scores)
         return results[:top_k]

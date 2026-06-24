@@ -2,7 +2,8 @@ import re
 
 STOP_WORDS = {
     "the", "and", "is", "in", "of", "to", "a", "an", "for", "on",
-    "with", "as", "by", "at", "from", "this", "that", "it", "be"
+    "with", "as", "by", "at", "from", "this", "that", "it", "be",
+    "what"
 }
 
 
