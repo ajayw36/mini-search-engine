@@ -3,6 +3,7 @@
 from search_engine.indexer import build_index
 from search_engine.loader import CORPUS_DIR, load_documents
 from search_engine.ranker import build_tf_idf, rank
+from search_engine.tokenizer import tokenize
 
 
 class SearchEngine:
