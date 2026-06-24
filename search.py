@@ -28,7 +28,13 @@ def build_index(documents):
             index[token][doc_path] += 1
     return index
 
-# Match Count Ranking --> returns a list of documents ranked by score
+def compute_tf(token, document):
+    return True
+
+def compute_idf(token, index):
+    return True
+
+# Term Frequency Ranking --> returns a list of documents ranked by score
 def search(query, index):
     query_tokens = tokenize(query)
     ranker = defaultdict(int)
