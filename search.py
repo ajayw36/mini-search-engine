@@ -1,6 +1,7 @@
 from pathlib import Path
 import re
 from collections import defaultdict
+import math
 
 DOCS_DIR = Path("docs")
 STOP_WORDS = {
@@ -24,21 +25,34 @@ def tokenize(text):
     tokens = re.findall(r"[a-z0-9]+", text)
     return [token for token in tokens if token not in STOP_WORDS]
 
-# Indexer - returns token --> frequency counter of docs
+# TF - IDF Index
 def build_index(documents):
-    index = defaultdict(lambda: defaultdict(int))
+    tf_idf_index = defaultdict(dict)
+    num_documents = len(documents)
+    tokenized_documents = {}
+
+    frequency_counter = defaultdict(lambda : defaultdict(int))
     for doc_path, text in documents.items():
-        for token in tokenize(text):
-            index[token][doc_path] += 1
-    return index
+        tokenized_text = tokenize(text)
+        tokenized_documents[doc_path] = tokenized_text
 
-def compute_tf(token, document):
-    return True
+        for token in tokenized_text:
+            frequency_counter[token][doc_path] += 1
+        
+    
+    for token, document_counter in frequency_counter.items():
+        for doc_path, count in document_counter.items():
+            document_length = len(tokenized_documents[doc_path])
+            tf = count / document_length
 
-def compute_idf(token, index):
-    return True
+            docs_containing_token = len(document_counter)
+            idf = math.log (num_documents / docs_containing_token)
+        
+            tf_idf_index[token][doc_path] = tf * idf
+    
+    return tf_idf_index
 
-# Term Frequency Ranking --> returns a list of documents ranked by score
+#  Ranking 
 def search(query, index):
     query_tokens = tokenize(query)
     ranker = defaultdict(int)
