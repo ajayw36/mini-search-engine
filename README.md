@@ -19,7 +19,7 @@ Type a query to see the top 10 matching documents (with their scores), or
 type `quit` to exit.
 
 ```
-Loaded 2077 documents.
+Loaded 709 documents.
 Type a search query, or type 'quit' to exit.
 
 Search: async def routing

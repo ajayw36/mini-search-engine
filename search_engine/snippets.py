@@ -1,16 +1,18 @@
-"""Generate short text snippets around query matches for search results.
+from search_engine.tokenizer import tokenize
+import re
 
-Not yet implemented. The intent is: given a document's text and the query,
-return a short excerpt centered on the first matching term so it can be shown
-beneath each search result.
-"""
+def make_snippet(text, query, window=200):
+    """Return a short excerpt of `text` around the first query-term match."""
+    query_tokens = tokenize(query)
+    lower_text = text.lower()
 
+    for token in query_tokens:
+        match = re.search(rf"\b{re.escape(token)}\b", lower_text)
+        if match:
+            start = max(0, match.start() - window)
+            end = min(len(text), match.end() + window)
 
-def make_snippet(text, query, max_length=200):
-    """Return a short excerpt of `text` around the first query-term match.
+            snippet = text[start:end].replace("\n", " ")
+            return "..." + snippet + "..."
 
-    TODO: implement snippet extraction (find a query term in `text`, slice a
-    window of roughly `max_length` characters around it, trim to word
-    boundaries, and optionally highlight the match).
-    """
-    raise NotImplementedError("snippet generation is not implemented yet")
+    return text[:120].replace("\n", " ") + "..."

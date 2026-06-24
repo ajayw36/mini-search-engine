@@ -1,6 +1,7 @@
 """Command-line entry point for the mini search engine."""
 
 from search_engine.search import SearchEngine
+from search_engine.snippets import make_snippet
 
 
 def main():
@@ -22,7 +23,9 @@ def main():
             continue
 
         for position, (doc_path, score) in enumerate(results, start=1):
+            snippet = make_snippet(engine.documents[doc_path], query)
             print(f"{position}. {doc_path} — score: {score}")
+            print(f"    {snippet}")
 
 
 if __name__ == "__main__":
