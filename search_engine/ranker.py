@@ -25,7 +25,7 @@ def rank(query, scored_index):
     `scored_index` is a precomputed {token: {doc_path: score}} mapping
     (e.g. from `build_tf_idf`), so this function only sums and sorts.
     """
-    query_tokens = tokenize(query)
+    query_tokens = set(tokenize(query))
     scores = defaultdict(float)
 
     for token in query_tokens:
