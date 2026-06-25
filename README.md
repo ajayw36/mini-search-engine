@@ -2,11 +2,13 @@
 
 A small search engine over a local corpus of Markdown files implemented with
 TF-IDF and BM25 Ranking. It loads the documents under `corpus/`, builds a TF-IDF or BM25
-index in memory, and ranksdocuments against a query from an interactive command-line prompt.
+index in memory, and ranks documents against a query.
 
-No third-party dependencies — it uses only the Python standard library.
+Available as a command-line interface or web interface.
 
 ## Running
+
+### Command-line interface
 
 From the project root:
 
@@ -26,6 +28,16 @@ Search: async def routing
 1. corpus/fastapi/docs_ko_docs_async.md — score: 0.4741
 ...
 ```
+
+### Web interface
+
+Start the Flask web server:
+
+```bash
+python flask_app.py
+```
+
+Then open `http://localhost:5000` in your browser. Search results display with snippets and relevance scores.
 
 ## How it works
 
@@ -61,6 +73,16 @@ Because scoring is a single, swappable step (`build_tf_idf` in `__init__`),
 adding another ranking method means writing a new scorer and
 changing one line — `rank` stays the same.
 
+## Deployment
+
+The web interface is deployed on Render's free tier at:
+https://mini-search-engine-xxxxx.onrender.com
+
+To deploy your own:
+1. Create a Render account and connect your GitHub repo
+2. Add a Web Service with Start Command: `gunicorn flask_app:app`
+3. Render auto-deploys on each push to main
+
 ## Layout
 
 ```
@@ -76,9 +98,16 @@ mini-search-engine/
 │   ├── indexer.py       raw frequency index + doc lengths
 │   ├── ranker.py        TF-IDF and BM25 scoring + sum/sort ranking
 │   ├── search.py        SearchEngine orchestration
-│   └── snippets.py      result snippets (not implemented yet)
+│   └── snippets.py      result snippets and titles
+├── templates/
+│   └── index.html       web interface
+├── static/
+│   └── style.css        web interface styling
 ├── tests/               a complete test suite
 ├── app.py               command-line entry point
+├── flask_app.py         web server entry point
+├── Procfile             deployment config
+├── render.yaml          Render deployment config
 ├── requirements.txt
 └── README.md
 ```
@@ -86,6 +115,5 @@ mini-search-engine/
 ## Not implemented yet
 
 - storing index once it is created so you don't recompute every time you run
-- switching from file paths to doc ids
 - adding phrase search
-- adding a flask frontend
+- web crawler integration
