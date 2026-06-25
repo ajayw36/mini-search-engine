@@ -22,9 +22,12 @@ def main():
             print("No results found.")
             continue
 
-        for position, (doc_path, score) in enumerate(results, start=1):
-            snippet = make_snippet(engine.documents[doc_path], query)
-            title = get_title(doc_path, engine.documents[doc_path])
+        for position, (doc_id, score) in enumerate(results, start=1):
+            doc_metadata = engine.get_doc(doc_id)
+            text = doc_metadata["text"]
+            doc_path = doc_metadata["path"]
+            snippet = make_snippet(text, query)
+            title = get_title(doc_path, text)
             print(f"{position}. {title} — score: {score:.4f}")
             print(f"   {snippet}")
             print()

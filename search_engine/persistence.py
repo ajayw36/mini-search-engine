@@ -8,6 +8,7 @@ CACHE_DIR = Path(__file__).parent.parent / ".search_cache"
 INDEX_FILE = CACHE_DIR / "index.pkl"
 DOC_LENGTHS_FILE = CACHE_DIR / "doc_lengths.pkl"
 SCORES_FILE = CACHE_DIR / "scores.pkl"
+METADATA_FILE = CACHE_DIR / "metadata.pkl"
 
 
 def ensure_cache_dir():
@@ -15,8 +16,8 @@ def ensure_cache_dir():
     CACHE_DIR.mkdir(exist_ok=True)
 
 
-def save_index(index, document_lengths, scores):
-    """Save index, document lengths, and scores to disk."""
+def save_index(index, document_lengths, scores, metadata):
+    """Save index, document lengths, scores, and metadata to disk."""
     ensure_cache_dir()
     with open(INDEX_FILE, "wb") as f:
         pickle.dump(index, f)
@@ -24,15 +25,17 @@ def save_index(index, document_lengths, scores):
         pickle.dump(document_lengths, f)
     with open(SCORES_FILE, "wb") as f:
         pickle.dump(scores, f)
+    with open(METADATA_FILE, "wb") as f:
+        pickle.dump(metadata, f)
 
 
 def load_index():
-    """Load index, document lengths, and scores from disk.
+    """Load index, document lengths, scores, and metadata from disk.
 
-    Returns (index, document_lengths, scores) or (None, None, None) if not cached.
+    Returns (index, document_lengths, scores, metadata) or (None, None, None, None) if not cached.
     """
-    if not all(f.exists() for f in [INDEX_FILE, DOC_LENGTHS_FILE, SCORES_FILE]):
-        return None, None, None
+    if not all(f.exists() for f in [INDEX_FILE, DOC_LENGTHS_FILE, SCORES_FILE, METADATA_FILE]):
+        return None, None, None, None
 
     with open(INDEX_FILE, "rb") as f:
         index = pickle.load(f)
@@ -40,12 +43,14 @@ def load_index():
         document_lengths = pickle.load(f)
     with open(SCORES_FILE, "rb") as f:
         scores = pickle.load(f)
+    with open(METADATA_FILE, "rb") as f:
+        metadata = pickle.load(f)
 
-    return index, document_lengths, scores
+    return index, document_lengths, scores, metadata
 
 
 def clear_cache():
     """Clear the cached index."""
-    for f in [INDEX_FILE, DOC_LENGTHS_FILE, SCORES_FILE]:
+    for f in [INDEX_FILE, DOC_LENGTHS_FILE, SCORES_FILE, METADATA_FILE]:
         if f.exists():
             f.unlink()

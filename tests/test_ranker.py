@@ -7,9 +7,9 @@ from search_engine.indexer import build_index
 class TestBuildTfIdf(unittest.TestCase):
     def setUp(self):
         documents = {
-            "doc1.txt": "machine learning algorithms",
-            "doc2.txt": "machine learning python",
-            "doc3.txt": "deep learning neural networks"
+            0: "machine learning algorithms",
+            1: "machine learning python",
+            2: "deep learning neural networks"
         }
         self.index, self.doc_lengths = build_index(documents)
 
@@ -46,16 +46,16 @@ class TestBuildTfIdf(unittest.TestCase):
     def test_tf_calculation(self):
         # With multiple docs, TF-IDF scores should differ for terms with different IDF
         documents = {
-            "doc1.txt": "machine learning python algorithms",
-            "doc2.txt": "machine learning java",
-            "doc3.txt": "deep learning neural networks"
+            0: "machine learning python algorithms",
+            1: "machine learning java",
+            2: "deep learning neural networks"
         }
         index, doc_lengths = build_index(documents)
         scores = build_tf_idf(index, doc_lengths)
 
-        # "python" should have high score (rare term, appears only in doc1)
+        # "python" should have high score (rare term, appears only in doc0)
         self.assertIn("python", scores)
-        python_score = scores["python"]["doc1.txt"]
+        python_score = scores["python"][0]
         self.assertGreater(python_score, 0)
 
         # "learning" appears in all docs, so should have 0 IDF
@@ -72,9 +72,9 @@ class TestBuildTfIdf(unittest.TestCase):
 class TestBuildBm25(unittest.TestCase):
     def setUp(self):
         documents = {
-            "doc1.txt": "machine learning algorithms",
-            "doc2.txt": "machine learning python",
-            "doc3.txt": "deep learning neural networks"
+            0: "machine learning algorithms",
+            1: "machine learning python",
+            2: "deep learning neural networks"
         }
         self.index, self.doc_lengths = build_index(documents)
 
@@ -98,36 +98,36 @@ class TestBuildBm25(unittest.TestCase):
     def test_bm25_term_frequency_saturation(self):
         # BM25 should saturate term frequency (diminishing returns for repeated terms)
         documents = {
-            "short.txt": "word word",
-            "long.txt": "word word word word word"
+            0: "word word",
+            1: "word word word word word"
         }
         index, doc_lengths = build_index(documents)
         scores = build_bm_25(index, doc_lengths)
 
         # The score difference shouldn't be proportional to frequency difference (5:2)
         # BM25 saturates, so the ratio should be less than 2.5
-        short_score = scores["word"]["short.txt"]
-        long_score = scores["word"]["long.txt"]
+        short_score = scores["word"][0]
+        long_score = scores["word"][1]
 
         self.assertLess(long_score / short_score, 2.5)
 
     def test_bm25_document_length_normalization(self):
         # Both documents should get BM25 scores
         documents = {
-            "short.txt": "relevant important",
-            "long.txt": "relevant filler filler filler"
+            0: "relevant important",
+            1: "relevant filler filler filler"
         }
         index, doc_lengths = build_index(documents)
         scores = build_bm_25(index, doc_lengths)
 
         # Both should have a score for "relevant"
         self.assertIn("relevant", scores)
-        self.assertIn("short.txt", scores["relevant"])
-        self.assertIn("long.txt", scores["relevant"])
+        self.assertIn(0, scores["relevant"])
+        self.assertIn(1, scores["relevant"])
 
         # Both scores should be numeric
-        short_score = scores["relevant"]["short.txt"]
-        long_score = scores["relevant"]["long.txt"]
+        short_score = scores["relevant"][0]
+        long_score = scores["relevant"][1]
         self.assertIsInstance(short_score, float)
         self.assertIsInstance(long_score, float)
 
@@ -136,7 +136,7 @@ class TestBuildBm25(unittest.TestCase):
         # Note: with empty document_lengths, avg_length would cause division by zero
         # So we test with at least one document
         index = {}
-        doc_lengths = {"doc1.txt": 10}
+        doc_lengths = {0: 10}
         scores = build_bm_25(index, doc_lengths)
         self.assertEqual(len(scores), 0)
 
@@ -144,9 +144,9 @@ class TestBuildBm25(unittest.TestCase):
 class TestRank(unittest.TestCase):
     def setUp(self):
         documents = {
-            "doc1.txt": "machine learning is great",
-            "doc2.txt": "python machine learning",
-            "doc3.txt": "deep learning networks"
+            0: "machine learning is great",
+            1: "python machine learning",
+            2: "deep learning networks"
         }
         self.index, self.doc_lengths = build_index(documents)
         self.scores = build_tf_idf(self.index, self.doc_lengths)
@@ -163,7 +163,7 @@ class TestRank(unittest.TestCase):
 
         for result in results:
             self.assertEqual(len(result), 2)
-            self.assertIsInstance(result[0], str)
+            self.assertIsInstance(result[0], int)
             self.assertIsInstance(result[1], float)
 
     def test_rank_empty_query(self):
@@ -178,7 +178,7 @@ class TestRank(unittest.TestCase):
         results = rank("machine", self.scores)
 
         self.assertGreater(len(results), 0)
-        self.assertIn("doc1.txt", [r[0] for r in results])
+        self.assertIn(0, [r[0] for r in results])
 
     def test_rank_combines_scores(self):
         # Query with multiple terms should combine their scores
@@ -188,8 +188,8 @@ class TestRank(unittest.TestCase):
         # Documents in multi-term query should have higher scores (combination)
         multi_scores = {doc: score for doc, score in results_multi}
 
-        if "doc1.txt" in multi_scores:
-            self.assertGreater(multi_scores["doc1.txt"], 0)
+        if 0 in multi_scores:
+            self.assertGreater(multi_scores[0], 0)
 
     def test_rank_stop_words_ignored(self):
         # Query with stop words should be filtered out
@@ -215,9 +215,9 @@ class TestRank(unittest.TestCase):
 class TestRankWithBm25(unittest.TestCase):
     def setUp(self):
         documents = {
-            "doc1.txt": "machine learning is great",
-            "doc2.txt": "python machine learning",
-            "doc3.txt": "deep learning networks"
+            0: "machine learning is great",
+            1: "python machine learning",
+            2: "deep learning networks"
         }
         self.index, self.doc_lengths = build_index(documents)
         self.scores = build_bm_25(self.index, self.doc_lengths)
