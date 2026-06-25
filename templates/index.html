@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Search Engine</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mini Search Engine</h1>
+            <p class="doc-count">Indexed {{ doc_count }} documents</p>
+        </header>
+
+        <div class="search-box">
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Enter your search query..."
+                autocomplete="off"
+            >
+            <button id="searchBtn">Search</button>
+        </div>
+
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById("searchInput");
+        const searchBtn = document.getElementById("searchBtn");
+        const resultsDiv = document.getElementById("results");
+
+        async function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            resultsDiv.innerHTML = "<p class='loading'>Searching...</p>";
+
+            try {
+                const response = await fetch("/api/search", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await response.json();
+                displayResults(data.results, query);
+            } catch (error) {
+                resultsDiv.innerHTML = "<p class='error'>Error searching. Please try again.</p>";
+                console.error("Search error:", error);
+            }
+        }
+
+        function displayResults(results, query) {
+            if (results.length === 0) {
+                resultsDiv.innerHTML = "<p class='no-results'>No results found</p>";
+                return;
+            }
+
+            let html = "";
+
+            results.forEach((result, index) => {
+                html += `
+                    <div class="result-item">
+                        <h3>${index + 1}. ${escapeHtml(result.title)}</h3>
+                        <p class="snippet">${escapeHtml(result.snippet)}</p>
+                    </div>
+                `;
+            });
+
+            resultsDiv.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        searchBtn.addEventListener("click", performSearch);
+        searchInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") performSearch();
+        });
+
+        // Focus search input on page load
+        searchInput.focus();
+    </script>
+</body>
+</html>
