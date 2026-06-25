@@ -2,7 +2,7 @@
 
 from search_engine.indexer import build_index
 from search_engine.loader import CORPUS_DIR, load_documents
-from search_engine.ranker import build_tf_idf, rank
+from search_engine.ranker import build_tf_idf, build_bm_25, rank
 from search_engine.tokenizer import tokenize
 
 
@@ -12,7 +12,7 @@ class SearchEngine:
         self.index, self.document_lengths = build_index(self.documents)
         # Score the whole corpus once, up front. Swap build_tf_idf for
         # another scorer (e.g. build_bm25) to change ranking methods.
-        self.scores = build_tf_idf(self.index, self.document_lengths)
+        self.scores = build_bm_25(self.index, self.document_lengths)
 
     def search(self, query, top_k=3):
         """Return the top `top_k` (doc_path, score) results for `query`."""
