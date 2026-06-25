@@ -5,6 +5,7 @@ __pycache__/
 
 # Test / tooling caches
 .pytest_cache/
+.search_cache/
 
 # Virtual environments
 .venv/
